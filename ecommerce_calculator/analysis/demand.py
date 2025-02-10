@@ -1,5 +1,5 @@
 from typing import Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 from ecommerce_calculator.database.operations import load_product_data
 
@@ -14,21 +14,23 @@ def get_product_demand(product_id: str, start_date: str, end_date: str) -> Optio
         return None
         
     try:
-        start = datetime.fromisoformat(start_date)
-        end = datetime.fromisoformat(end_date)
+        # Parse dates and ensure they're timezone-aware
+        start = datetime.fromisoformat(start_date).replace(tzinfo=timezone.utc)
+        end = datetime.fromisoformat(end_date).replace(tzinfo=timezone.utc)
         
         logger.info(f"Filtering demand history between {start} and {end}")
         
         # Filter demand history to requested date range
-        filtered_history = [
-            entry for entry in product['history']
-            if start <= datetime.fromisoformat(entry['date']) <= end
-        ]
+        filtered_history = []
+        for entry in product['history']:
+            entry_date = datetime.fromisoformat(entry['date']).replace(tzinfo=timezone.utc)
+            if start <= entry_date <= end:
+                filtered_history.append(entry)
         
         # Group data by month
         monthly_data = {}
         for entry in filtered_history:
-            date = datetime.fromisoformat(entry['date'])
+            date = datetime.fromisoformat(entry['date']).replace(tzinfo=timezone.utc)
             month_key = date.strftime('%Y-%m')  # Format: YYYY-MM
             
             if month_key not in monthly_data:

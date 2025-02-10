@@ -17,3 +17,27 @@
 2025-02-10 13:46:35 - INFO - Routing ecommerce calculator request
 2025-02-10 13:46:36 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
 2025-02-10 13:46:36 - INFO - Retrying request to /chat/completions in 20.000000 seconds
+2025-02-10 13:49:28 - INFO - Processing ecommerce calculator request
+2025-02-10 13:49:28 - INFO - Routing ecommerce calculator request
+2025-02-10 13:49:30 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-02-10 13:49:30 - INFO - Request routed as: analyze_product_demand with confidence: 0.95
+2025-02-10 13:49:30 - INFO - Processing demand analysis request
+2025-02-10 13:49:32 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-02-10 13:49:32 - INFO - Validating input - product_id: 985b030a-f6b0-47d9-98d3-98c3c7d35f06, start_date: 2024-01-01T00:00:00Z, end_date: 2024-12-31T23:59:59Z
+2025-02-10 13:49:32 - INFO - Getting demand data for product: 985b030a-f6b0-47d9-98d3-98c3c7d35f06
+2025-02-10 13:49:33 - INFO - Filtering demand history between 2024-01-01 00:00:00+00:00 and 2024-12-31 23:59:59+00:00
+2025-02-10 13:49:33 - ERROR - Error processing demand data: can't compare offset-naive and offset-aware datetimes
+2025-02-10 13:50:51 - INFO - Processing ecommerce calculator request
+2025-02-10 13:50:51 - INFO - Routing ecommerce calculator request
+2025-02-10 13:50:53 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-02-10 13:50:53 - INFO - Request routed as: analyze_product_demand with confidence: 0.95
+2025-02-10 13:50:53 - INFO - Processing demand analysis request
+2025-02-10 13:50:59 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-02-10 13:50:59 - INFO - Validating input - product_id: 985b030a-f6b0-47d9-98d3-98c3c7d35f06, start_date: 2024-01-01T00:00:00Z, end_date: 2024-12-31T23:59:59Z
+2025-02-10 13:50:59 - INFO - Getting demand data for product: 985b030a-f6b0-47d9-98d3-98c3c7d35f06
+2025-02-10 13:51:00 - INFO - Filtering demand history between 2024-01-01 00:00:00+00:00 and 2024-12-31 23:59:59+00:00
+2025-02-10 13:51:11 - INFO - Processing ecommerce calculator request
+2025-02-10 13:51:11 - INFO - Routing ecommerce calculator request
+2025-02-10 13:51:12 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-02-10 13:51:12 - INFO - Request routed as: other with confidence: 0.0
+2025-02-10 13:51:12 - WARNING - Low confidence score: 0.0
