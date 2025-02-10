@@ -39,21 +39,25 @@ def main():
         if choice == "1":
             print("\nTesting lifecycle analysis...")
             test_input = f"What's the lifecycle stage for product {product_id}?"
+            print(f"Test input: {test_input}")
             result = process_ecommerce_request(test_input)
             
         elif choice == "2":
             print("\nTesting seasonality analysis...")
             test_input = f"Is product {product_id} seasonal?"
+            print(f"Test input: {test_input}")
             result = process_ecommerce_request(test_input)
             
         elif choice == "3":
             print("\nTesting demand analysis...")
             test_input = f"What's the demand forecast for product {product_id} between 2024-01-01 and 2024-12-31?"
+            print(f"Test input: {test_input}")
             result = process_ecommerce_request(test_input)
             
         elif choice == "4":
             print("\nTesting invalid request...")
             test_input = "What's the weather like today?"
+            print(f"Test input: {test_input}")
             result = process_ecommerce_request(test_input)
             
         elif choice == "0":
