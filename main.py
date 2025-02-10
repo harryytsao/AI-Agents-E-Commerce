@@ -75,7 +75,7 @@ def load_product_data(product_id: str) -> Optional[Dict[str, Any]]:
         )
         cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         
-        # Query product data
+        # Try both UUID and string matching
         cursor.execute("""
             SELECT product_id,
                    name,
@@ -84,8 +84,10 @@ def load_product_data(product_id: str) -> Optional[Dict[str, Any]]:
                    attributes,
                    history
             FROM products
-            WHERE name = %s
-        """, (product_id,))
+            WHERE product_id::text = %s
+               OR name ILIKE %s
+               OR product_id = %s
+        """, (product_id, f"%{product_id}%", product_id))
         
         product = cursor.fetchone()
         
@@ -342,25 +344,70 @@ def interpret_seasonality(seasonality_data: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 def get_product_demand(product_id: str, start_date: str, end_date: str) -> Optional[Dict[str, Any]]:
-    """Get product demand data for date range"""
+    """Get product demand data for date range as monthly time series"""
+    logger.info(f"Getting demand data for product: {product_id}")
     product = load_product_data(product_id)
-    if not product or 'demandHistory' not in product:
+    if not product or 'history' not in product:
+        logger.error(f"Product not found or missing history: {product_id}")
         return None
         
     try:
         start = datetime.fromisoformat(start_date)
         end = datetime.fromisoformat(end_date)
         
+        logger.info(f"Filtering demand history between {start} and {end}")
+        
         # Filter demand history to requested date range
         filtered_history = [
-            entry for entry in product['demandHistory']['monthly']
+            entry for entry in product['history']
             if start <= datetime.fromisoformat(entry['date']) <= end
         ]
         
+        # Group data by month
+        monthly_data = {}
+        for entry in filtered_history:
+            date = datetime.fromisoformat(entry['date'])
+            month_key = date.strftime('%Y-%m')  # Format: YYYY-MM
+            
+            if month_key not in monthly_data:
+                monthly_data[month_key] = {
+                    'sales': 0,
+                    'revenue': 0,
+                    'returns': 0,
+                    'average_price': 0,
+                    'num_transactions': 0
+                }
+            
+            monthly_data[month_key]['sales'] += entry['sales']
+            monthly_data[month_key]['revenue'] += entry['sales'] * entry['price']
+            monthly_data[month_key]['returns'] += entry.get('returns', 0)
+            monthly_data[month_key]['num_transactions'] += 1
+        
+        # Calculate averages and format time series
+        time_series = []
+        for month in sorted(monthly_data.keys()):
+            data = monthly_data[month]
+            avg_price = data['revenue'] / data['sales'] if data['sales'] > 0 else 0
+            
+            time_series.append({
+                'month': month,
+                'total_sales': data['sales'],
+                'total_revenue': round(data['revenue'], 2),
+                'total_returns': data['returns'],
+                'average_price': round(avg_price, 2),
+                'return_rate': round(data['returns'] / data['sales'], 4) if data['sales'] > 0 else 0
+            })
+        
         return {
-            'demand_history': filtered_history,
-            'metrics': product.get('metrics', {})
+            'time_series': time_series,
+            'summary': {
+                'total_months': len(time_series),
+                'total_sales': sum(m['total_sales'] for m in time_series),
+                'total_revenue': round(sum(m['total_revenue'] for m in time_series), 2),
+                'average_monthly_sales': round(sum(m['total_sales'] for m in time_series) / len(time_series), 2) if time_series else 0
+            }
         }
+        
     except Exception as e:
         logger.error(f"Error processing demand data: {e}")
         return None
@@ -490,15 +537,25 @@ class DemandTool(Tool):
         )
     
     def validate_input(self, product_id: str, start_date: str, end_date: str) -> bool:
+        logger.info(f"Validating input - product_id: {product_id}, start_date: {start_date}, end_date: {end_date}")
+        
         if not isinstance(product_id, str) or not bool(product_id.strip()):
+            logger.error("Invalid product_id")
             return False
             
         try:
             # Validate date formats
-            datetime.fromisoformat(start_date)
-            datetime.fromisoformat(end_date)
+            start = datetime.fromisoformat(start_date)
+            end = datetime.fromisoformat(end_date)
+            
+            # Add validation for start date before end date
+            if start > end:
+                logger.error("Start date is after end date")
+                return False
+                
             return True
-        except ValueError:
+        except ValueError as e:
+            logger.error(f"Date validation error: {e}")
             return False
     
     def execute(self, product_id: str, start_date: str, end_date: str) -> Dict[str, Any]:
@@ -567,7 +624,7 @@ def handle_lifecycle_analysis(description: str) -> EcommerceResponse:
     details = ProductLifecycleDetails.model_validate_json(response_json)
 
     # Clean up product ID - replace underscores with spaces
-    product_id = details.product_id.replace('_', ' ')
+    product_id = details.product_id.replace('_', ' ').lower()
 
     # Get lifecycle tool from repository
     lifecycle_tool = tool_repository.get_tool("product_lifecycle")
@@ -632,7 +689,7 @@ def handle_seasonality_analysis(description: str) -> EcommerceResponse:
     details = SeasonalityDetails.model_validate_json(response_json)
 
     # Clean up product ID - replace underscores with spaces
-    product_id = details.product_id.replace('_', ' ')
+    product_id = details.product_id.replace('_', ' ').lower()
 
     # Get seasonality tool from repository
     seasonality_tool = tool_repository.get_tool("product_seasonality")
@@ -697,7 +754,7 @@ def handle_demand_analysis(description: str) -> EcommerceResponse:
     details = DemandDetails.model_validate_json(response_json)
 
     # Clean up product ID - replace underscores with spaces
-    product_id = details.product_id.replace('_', ' ')
+    product_id = details.product_id.replace('_', ' ').lower()
 
     # Get demand tool from repository
     demand_tool = tool_repository.get_tool("product_demand")
@@ -812,7 +869,7 @@ def main():
         
         if choice == "1":
             print("\nTesting lifecycle analysis...")
-            lifecycle_input = "What's the lifecycle stage for product 'material can'?"
+            lifecycle_input = "What's the lifecycle stage for product '985b030a-f6b0-47d9-98d3-98c3c7d35f06'?"
             result = process_ecommerce_request(lifecycle_input)
             if result:
                 print(f"\nSuccess: {result.success}")
@@ -830,7 +887,7 @@ def main():
                 
         elif choice == "2":
             print("\nTesting seasonality analysis...")
-            seasonality_input = "Is product 'material can' seasonal?"
+            seasonality_input = "Is product '985b030a-f6b0-47d9-98d3-98c3c7d35f06' seasonal?"
             result = process_ecommerce_request(seasonality_input)
             if result:
                 print(f"\nSuccess: {result.success}")
@@ -847,7 +904,7 @@ def main():
                 
         elif choice == "3":
             print("\nTesting demand analysis...")
-            demand_input = "What's the demand forecast for product 'Awesome Sausages'?"
+            demand_input = "What's the demand forecast for product '985b030a-f6b0-47d9-98d3-98c3c7d35f06' of FY2024?"
             result = process_ecommerce_request(demand_input)
             if result:
                 print(f"\nSuccess: {result.success}")
@@ -855,6 +912,10 @@ def main():
                 if result.analysis_data:
                     print("\nAnalysis Data:")
                     print(json.dumps(result.analysis_data, indent=2))
+                    # Generate and print the summary
+                    print("\nSummary:")
+                    summary = generate_analysis_summary(result.analysis_data)
+                    print(summary)
             else:
                 print("\nNo response received")
                 
