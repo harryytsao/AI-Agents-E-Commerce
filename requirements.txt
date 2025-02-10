@@ -1,0 +1,4 @@
+# Core dependencies
+pytest
+black
+flake8 
