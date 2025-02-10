@@ -1,0 +1,19 @@
+2025-02-10 13:45:14 - INFO - Processing ecommerce calculator request
+2025-02-10 13:45:14 - INFO - Routing ecommerce calculator request
+2025-02-10 13:45:14 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 404 Not Found"
+2025-02-10 13:46:07 - INFO - Processing ecommerce calculator request
+2025-02-10 13:46:07 - INFO - Routing ecommerce calculator request
+2025-02-10 13:46:09 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-02-10 13:46:09 - INFO - Request routed as: analyze_product_lifecycle with confidence: 0.95
+2025-02-10 13:46:09 - INFO - Processing lifecycle analysis request
+2025-02-10 13:46:11 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-02-10 13:46:26 - INFO - Processing ecommerce calculator request
+2025-02-10 13:46:26 - INFO - Routing ecommerce calculator request
+2025-02-10 13:46:29 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-02-10 13:46:29 - INFO - Request routed as: analyze_product_seasonality with confidence: 0.95
+2025-02-10 13:46:29 - INFO - Processing seasonality analysis request
+2025-02-10 13:46:30 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-02-10 13:46:35 - INFO - Processing ecommerce calculator request
+2025-02-10 13:46:35 - INFO - Routing ecommerce calculator request
+2025-02-10 13:46:36 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-02-10 13:46:36 - INFO - Retrying request to /chat/completions in 20.000000 seconds
