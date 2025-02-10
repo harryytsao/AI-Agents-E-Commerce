@@ -41,3 +41,32 @@
 2025-02-10 13:51:12 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
 2025-02-10 13:51:12 - INFO - Request routed as: other with confidence: 0.0
 2025-02-10 13:51:12 - WARNING - Low confidence score: 0.0
+2025-02-10 14:15:11 - INFO - Processing ecommerce calculator request
+2025-02-10 14:15:11 - INFO - Routing ecommerce calculator request
+2025-02-10 14:15:12 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-02-10 14:15:12 - INFO - Request routed as: analyze_product_lifecycle with confidence: 0.9
+2025-02-10 14:15:12 - INFO - Processing lifecycle analysis request
+2025-02-10 14:15:13 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-02-10 14:15:14 - ERROR - Error loading product data: invalid input syntax for type uuid: "specific product id"
+LINE 11:                OR product_id = 'specific product id'
+                                        ^
+
+2025-02-10 14:17:13 - INFO - Processing ecommerce calculator request
+2025-02-10 14:17:13 - INFO - Routing ecommerce calculator request
+2025-02-10 14:17:15 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-02-10 14:17:15 - INFO - Request routed as: analyze_product_lifecycle with confidence: 0.95
+2025-02-10 14:17:15 - INFO - Processing lifecycle analysis request
+2025-02-10 14:17:18 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-02-10 14:17:42 - INFO - Processing ecommerce calculator request
+2025-02-10 14:17:42 - INFO - Routing ecommerce calculator request
+2025-02-10 14:17:44 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-02-10 14:17:44 - INFO - Request routed as: analyze_product_seasonality with confidence: 0.95
+2025-02-10 14:17:44 - INFO - Processing seasonality analysis request
+2025-02-10 14:17:45 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-02-10 14:17:58 - INFO - Processing ecommerce calculator request
+2025-02-10 14:17:58 - INFO - Routing ecommerce calculator request
+2025-02-10 14:18:00 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-02-10 14:18:00 - INFO - Request routed as: analyze_product_demand with confidence: 0.9
+2025-02-10 14:18:00 - INFO - Processing demand analysis request
+2025-02-10 14:18:00 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-02-10 14:18:00 - INFO - Retrying request to /chat/completions in 20.000000 seconds
